@@ -1,147 +1,92 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { CONTRACT_ABI, CONTRACT_ADDRESS } from "../contracts/ContratoSubasta";
+import {
+  CONTRATO_USUARIOS_ABI,
+  CONTRATO_USUARIOS_ADDRESS,
+} from "../contracts/Usuarios";
 
 function Home() {
   const [account, setAccount] = useState(null);
   const [contract, setContract] = useState(null);
-  const [articulo, setArticulo] = useState("");
-  const [montoBase, setMontoBase] = useState("");
-  const [duracion, setDuracion] = useState("");
-  const [oferta, setOferta] = useState("");
-  const [subasta, setSubasta] = useState({});
-  const [mejor, setMejor] = useState({});
-  const [subastaActiva, setSubastaActiva] = useState(false);
-  const [subastaFinalizada, setSubastaFinalizada] = useState(false);
 
+  const [cuenta, setCuenta] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [edad, setEdad] = useState(0);
+
+  const [guias, setGuias] = useState([]);
+  const [turistas, setTuristas] = useState([]);
+
+  //Cunado inica el proyecto, se crea el contrato y se obtiene la cuenta del usuario.
   useEffect(() => {
     const init = async () => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-      const contrato = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        CONTRACT_ABI,
+      const contratoUsuarios = new ethers.Contract(
+        CONTRATO_USUARIOS_ADDRESS,
+        CONTRATO_USUARIOS_ABI,
         signer
       );
-      const acc = await signer.getAddress();
-      setAccount(acc);
-      setContract(contrato);
+      const account = await signer.getAddress();
+      const network = await provider.getNetwork();
+
+      console.log("Cuenta conectada:", account);
+      console.log("Red conectada:", network);
+      console.log("Contrato en:", CONTRATO_USUARIOS_ADDRESS);
+
+      setAccount(account);
+      setContract(contratoUsuarios);
     };
     init();
   }, []);
 
-  const registrarse = async () => {
-    console.log("Llamando contrato:", contract.address, "Desde:", account);
-    const tx = await contract.registrarseComoOferente();
-    await tx.wait();
-    alert("Registrado como oferente.");
+  //Funciones
+  const registrarGuia = async () => {
+    try {
+      const tx = await contract.registrarGuiaTurista(cuenta, nombre);
+      await tx.wait();
+      alert("Guía registrado");
+    } catch (error) {
+      console.error("Error al registrar guía:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
   };
 
-  const crearSubasta = async () => {
-    const tx = await contract.crearSubasta(articulo, montoBase, duracion);
-    await tx.wait();
-    alert("Subasta creada.");
-  };
-
-  const ofertar = async () => {
-    const tx = await contract.ofertar({ value: oferta });
-    await tx.wait();
-    alert("Oferta realizada.");
-  };
-
-  const finalizarSubasta = async () => {
-    const tx = await contract.finalizarSubasta();
-    await tx.wait();
-    alert("Subasta finalizada.");
-  };
-
-  const cargarDatos = async () => {
-    const info = await contract.subasta();
-    const mejor = await contract.verOfertaActual();
-    const activa = await contract.subastaActiva();
-    const finalizada = await contract.subastaFinalizada();
-
-    setSubasta({
-      articulo: info.articulo,
-      montoBase: info.montoBase.toString(),
-      tiempoLimite: info.tiempoLimite.toString(),
-    });
-
-    setMejor({
-      ofertante: mejor[0],
-      monto: mejor[1].toString(),
-    });
-
-    setSubastaActiva(activa);
-    setSubastaFinalizada(finalizada);
+  const cargarGuias = async () => {
+      try {
+      const resultado = await contract.verGuias();
+    setGuias(resultado);
+    } catch (error) {
+      console.error("Error al registrar guía:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+    
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Subasta dApp</h1>
-      <p>Cuenta: {account}</p>
+    <div className="container">
+      <h2>Cuenta del dueño: {account}</h2>
+      <button className="boton-naranja" onClick={registrarGuia}>
+        Registrar Guía de Turistas
+      </button>
 
-      <hr />
-
-      <h2>Registrarse</h2>
-      <button onClick={registrarse}>Registrarse como oferente</button>
-
-      <hr />
-
-      <h2>Crear Subasta</h2>
       <input
-        placeholder="Artículo"
-        onChange={(e) => setArticulo(e.target.value)}
+        placeholder="Cuenta"
+        style={{ width: "400px" }}
+        onChange={(e) => setCuenta(e.target.value)}
       />
-      <input
-        type="number"
-        placeholder="Monto base (wei)"
-        onChange={(e) => setMontoBase(e.target.value)}
-      />
-      <input
-        type="number"
-        placeholder="Duración (segundos)"
-        onChange={(e) => setDuracion(e.target.value)}
-      />
-      <button onClick={crearSubasta}>Crear subasta</button>
+      <input placeholder="Nombre" onChange={(e) => setNombre(e.target.value)} />
 
-      <hr />
-
-      <h2>Ofertar</h2>
-      <input
-        type="number"
-        placeholder="Monto (wei)"
-        onChange={(e) => setOferta(e.target.value)}
-      />
-      <button onClick={ofertar}>Ofertar</button>
-
-      <hr />
-
-      <h2>Finalizar</h2>
-      <button onClick={finalizarSubasta}>Finalizar subasta</button>
-
-      <hr />
-
-      <h2>Estado de la subasta</h2>
-      <button onClick={cargarDatos}>Actualizar</button>
-      <p>
-        <strong>Artículo:</strong> {subasta.articulo}
-      </p>
-      <p>
-        <strong>Monto base:</strong> {subasta.montoBase}
-      </p>
-      <p>
-        <strong>Tiempo límite:</strong> {subasta.tiempoLimite}
-      </p>
-      <p>
-        <strong>¿Activa?:</strong> {subastaActiva ? "Sí" : "No"}
-      </p>
-      <p>
-        <strong>¿Finalizada?:</strong> {subastaFinalizada ? "Sí" : "No"}
-      </p>
-      <p>
-        <strong>Mejor oferta:</strong> {mejor.monto} wei de {mejor.ofertante}
-      </p>
+      <h3>Lista de Guías de Turistas:</h3>
+      <button className="boton-azul" onClick={cargarGuias}>
+        Ver Guía de Turistas
+      </button>
+      <ul>
+        {guias.map((g, i) => (
+          <li key={i}>
+            {g.nombreCompleto} - {g.cuenta}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
