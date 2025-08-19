@@ -1,4 +1,4 @@
-export const CONTRATO_USUARIOS_ADDRESS = "0x8826fD8DbFFf500953dF37d9CE7400f3025ddd34"; //Address del dueño de la agrencia de turistas
+export const CONTRATO_USUARIOS_ADDRESS = "0xb73cca0869b8fB35f0fa55c1Ab8435888eb63212"; //Address del dueño de la agrencia de turistas
 
 export const CONTRATO_USUARIOS_ABI = [
   {

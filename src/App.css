@@ -17,7 +17,7 @@ body {
   padding: 10px 20px;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -32,7 +32,7 @@ body {
   padding: 10px 20px;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -41,13 +41,28 @@ body {
   background-color: #2a4b62;
 }
 
+.boton-rojo {
+  background-color: #e42626;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.boton-rojo:hover {
+  background-color: #c92121;
+}
+
 input {
     background-color: #292929; 
     color: azure; 
     padding: 10px 20px;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: 14px;
     margin: 0 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
 }
