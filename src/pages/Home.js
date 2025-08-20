@@ -10,10 +10,16 @@ import {
   CONTRATO_LUGARES_ADDRESS,
 } from "../contracts/Lugares";
 
+import {
+  CONTRATO_RESERVAS_ABI,
+  CONTRATO_RESERVAS_ADDRESS,
+} from "../contracts/Reservas";
+
 function Home() {
   const [account, setAccount] = useState(null);
   const [contratoUsuarios, setContratoUsuarios] = useState(null);
   const [contratoLugares, setContratoLugares] = useState(null);
+  const [contratoReservas, setContratoReservas] = useState(null);
 
   const [cuenta, setCuenta] = useState("");
   const [nombre, setNombre] = useState("");
@@ -30,6 +36,13 @@ function Home() {
   const [nombreLugar, setNombreLugar] = useState("");
   const [precio, setPrecio] = useState(0);
   const [cupos, setCupos] = useState(0);
+  const [fecha, setFecha] = useState("");
+
+  const [reserva, setReserva] = useState({});
+  const [reservas, setReservas] = useState([]);
+  const [id, setId] = useState(0);
+  const [monto, setMonto] = useState("");
+  const [cuentas, setCuentas] = useState("");
 
   //Cunado inica el proyecto, se crea el contrato y se obtiene la cuenta del usuario.
   useEffect(() => {
@@ -46,6 +59,11 @@ function Home() {
         CONTRATO_LUGARES_ABI,
         signer
       );
+      const contratoReserva = new ethers.Contract(
+        CONTRATO_RESERVAS_ADDRESS,
+        CONTRATO_RESERVAS_ABI,
+        signer
+      );
       const account = await signer.getAddress();
       const network = await provider.getNetwork();
 
@@ -56,6 +74,7 @@ function Home() {
       setAccount(account);
       setContratoUsuarios(contratoUsuarios);
       setContratoLugares(contratoLugares);
+      setContratoReservas(contratoReserva);
     };
     init();
   }, []);
@@ -208,6 +227,75 @@ function Home() {
     }
   };
 
+  //Funciones del contrato de registros
+  const registrarReserva = async () => {
+    try {
+      const fh = new Date(fecha);
+      const timestamp = Math.floor(fh.getTime() / 1000); // Convertir fecha a timestamp
+      const tx = await contratoReservas.registrarReservas(
+        nombreLugar,
+        cuenta,
+        timestamp
+      );
+      await tx.wait();
+      setCuenta("");
+      setNombreLugar("");
+      setFecha("");
+      alert("Reserva registrado");
+    } catch (error) {
+      console.error("Error al registrar la reserva:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
+  const verReservaciones = async () => {
+    try {
+      const resultado = await contratoReservas.verReservas();
+      setReservas(resultado);
+    } catch (error) {
+      console.error("Error al ver Reservaciones:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
+  const verReserva = async () => {
+    try {
+      const resultado = await contratoReservas.verReserva(id);
+      setReserva(resultado);
+      setId(0);
+    } catch (error) {
+      console.error("Error al Buscar Lugares:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
+  const asignarTuristas = async () => {
+    try {
+      const tx = await contratoReservas.asignarTuristas(id, {
+        value: ethers.parseEther(monto), // aquí va el equivalente a msg.value
+      });
+      setId(0);
+      setMonto("");
+      await tx.wait();
+      alert("Turista ingresado en la reserva");
+    } catch (error) {
+      console.error("Error al registrar el turista:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
+    const eliminarReserva = async () => {
+    try {
+      const tx = await contratoReservas.eliminarReserva(id);
+      await tx.wait();
+      setId(0);
+      alert("Reservación eliminado");
+    } catch (error) {
+      console.error("Error al eliminar la reserva:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
   return (
     <div className="container">
       <h3>Cuenta del dueño: {account}</h3>
@@ -344,7 +432,7 @@ function Home() {
         </div>
         <div>
           <input
-            placeholder="Cuenta"
+            placeholder="Cuenta del guía de turistas"
             style={{ width: "300px", marginLeft: "0px", marginTop: "10px" }}
             onChange={(e) => setCuenta(e.target.value)}
           />
@@ -385,6 +473,97 @@ function Home() {
         />
       </div>
 
+      <hr style={{ margin: "30px 0" }} />
+      <div>
+        <h2>Administración de Reservas</h2>
+        <button className="boton-naranja" onClick={registrarReserva}>
+          Registrar Reserva
+        </button>
+
+        <input
+          placeholder="Nombre del Lugar"
+          onChange={(e) => setNombreLugar(e.target.value)}
+        />
+        <input
+          placeholder="Cuenta del guía de turistas"
+          style={{ width: "300px" }}
+          onChange={(e) => setCuenta(e.target.value)}
+        />
+
+        {/* <textarea
+          placeholder="Ingrese un arreglo con las cuentas de los  turistas"
+          style={{ width: "500px", height: "150px", margin: "15px 0" }}
+          onChange={(e) => setCuenta(e.target.value)}
+        /> */}
+        <div>
+          <input
+            placeholder="Dia de la reservación"
+            type="datetime-local"
+            style={{ margin: "10px 0" }}
+            onChange={(e) => setFecha(e.target.value)}
+          />
+        </div>
+        <h3>Buscar Reserva por Número de reserva:</h3>
+        <button className="boton-azul" onClick={verReserva}>
+          Buscar Reserva
+        </button>
+        <input
+          placeholder="Número de Reserva"
+          type="number"
+          onChange={(e) => setId(e.target.value)}
+        />
+        <p>
+          Lugar de la reserva: {reserva.nombreLugar}, Total Cobrado en Wit:{" "}
+          {reserva.totalCobrado}, Cupos disponibles: {reserva.cuposDisponibles},
+          Cuenta del Guía: {reserva.guiaTuristas}, Fecha de la reserva:{" "}
+          {new Date(Number(reserva.fecha) * 1000).toLocaleString()}, Estado: {reserva.estado? " Activa": " Inactiva"}
+        </p>
+
+        <h3>Lista de Reservaciones:</h3>
+        <button className="boton-azul" onClick={verReservaciones}>
+          Ver Reservaciones
+        </button>
+        <ul>
+          {reservas.map((r, i) => (
+            <li key={i}>
+              Lugar de la reserva: {r.nombreLugar}, Total Cobrado en Wit:{" "}
+              {r.totalCobrado}, Cupos disponibles: {r.cuposDisponibles}, Cuenta
+              del Guía: {r.guiaTuristas}, Fecha de la reserva:{" "}
+              {new Date(Number(r.fecha) * 1000).toLocaleString()}, Estado: {r.estado? " Activa": " Inactiva"}
+            </li>
+          ))}
+        </ul>
+        <h3>Asignar turista al reservación:</h3>
+        <p>
+          En MetaMask tiene que estar con la cuenta del turista para realizar el
+          pago
+        </p>
+        <button className="boton-verde" onClick={asignarTuristas}>
+          Pagar Reservación
+        </button>
+        <input
+          placeholder="Número de Reserva"
+          type="number"
+          style={{ width: "70px" }}
+          onChange={(e) => setId(e.target.value)}
+        />
+        <input
+          placeholder="Pagar en ETH"
+          type="number"
+          style={{ width: "100px" }}
+          onChange={(e) => setMonto(e.target.value)}
+        />
+         <h3>Eliminar Reservación:</h3>
+        <button className="boton-rojo" onClick={eliminarReserva}>
+          Eliminar Reservación
+        </button>
+        <input
+          placeholder="Cuenta"
+          type="number"
+          style={{ width: "70px" }}
+          onChange={(e) => setId(e.target.value)}
+        />
+      </div>
       <hr style={{ margin: "30px 0" }} />
     </div>
   );
