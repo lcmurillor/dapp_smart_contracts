@@ -15,11 +15,23 @@ import {
   CONTRATO_RESERVAS_ADDRESS,
 } from "../contracts/Reservas";
 
+import {
+  CONTRATO_EXONERACIONES_ABI,
+  CONTRATO_EXONERACIONES_ADDRESS,
+} from "../contracts/Exoneraciones";
+
+import {
+  CONTRATO_RESENNAS_ABI,
+  CONTRATO_RESENNAS_ADDRESS,
+} from "../contracts/Resennas";
+
 function Home() {
   const [account, setAccount] = useState(null);
   const [contratoUsuarios, setContratoUsuarios] = useState(null);
   const [contratoLugares, setContratoLugares] = useState(null);
   const [contratoReservas, setContratoReservas] = useState(null);
+  const [contratoExoneraciones, setContratoExoneraciones] = useState(null);
+  const [contratoResennas, setContratoResennas] = useState(null);
 
   const [cuenta, setCuenta] = useState("");
   const [nombre, setNombre] = useState("");
@@ -44,6 +56,12 @@ function Home() {
   const [monto, setMonto] = useState("");
   const [cuentas, setCuentas] = useState("");
 
+  const [exoneracion, setExoneracion] = useState({});
+  const [exoneraciones, setExoneraciones] = useState([]);
+  const [mensajeLega, setMensajeLegal] = useState("");
+
+  const [puntaje, setPuntaje] = useState(0);
+const [comentario, setComentario] = useState("");
   //Cunado inica el proyecto, se crea el contrato y se obtiene la cuenta del usuario.
   useEffect(() => {
     const init = async () => {
@@ -64,6 +82,18 @@ function Home() {
         CONTRATO_RESERVAS_ABI,
         signer
       );
+      const contratoExoneraciones = new ethers.Contract(
+        CONTRATO_EXONERACIONES_ADDRESS,
+        CONTRATO_EXONERACIONES_ABI,
+        signer
+      );
+
+      const contratoResennas = new ethers.Contract(
+        CONTRATO_RESENNAS_ADDRESS,
+        CONTRATO_RESENNAS_ABI,
+        signer
+      );
+
       const account = await signer.getAddress();
       const network = await provider.getNetwork();
 
@@ -75,6 +105,8 @@ function Home() {
       setContratoUsuarios(contratoUsuarios);
       setContratoLugares(contratoLugares);
       setContratoReservas(contratoReserva);
+      setContratoExoneraciones(contratoExoneraciones);
+      setContratoResennas(contratoResennas);
     };
     init();
   }, []);
@@ -284,7 +316,7 @@ function Home() {
     }
   };
 
-    const eliminarReserva = async () => {
+  const eliminarReserva = async () => {
     try {
       const tx = await contratoReservas.eliminarReserva(id);
       await tx.wait();
@@ -292,6 +324,76 @@ function Home() {
       alert("Reservación eliminado");
     } catch (error) {
       console.error("Error al eliminar la reserva:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
+  //Funciones del contrato de exoneraciones
+  const verMensajeExoneraciones = async () => {
+    try {
+      const resultado = await contratoExoneraciones.verMensajeExoneraciones();
+      setMensajeLegal(resultado);
+    } catch (error) {
+      console.error("Error al ver Mensaje Exoneracion:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
+  const registrarExoneracion = async () => {
+    try {
+      const cuentasProcesadas = cuentas.split(",").map((c) => c.trim());
+      console.log("Cuentas de turistas:", cuentasProcesadas);
+
+      const tx = await contratoExoneraciones.registrarExoneracion(
+        id,
+        cuentasProcesadas
+      );
+      await tx.wait();
+      setId(0);
+      setCuenta("");
+      setCuentas("");
+      alert("Turistas exonerados");
+    } catch (error) {
+      console.error("Error al registrar la exoneracion:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
+  const verExoneracion = async () => {
+    try {
+      const resultado = await contratoExoneraciones.verExoneracion(id);
+      setExoneracion(resultado);
+    } catch (error) {
+      console.error("Error al ver Exoneracion:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
+  const verExoneraciones = async () => {
+    try {
+      const resultado = await contratoExoneraciones.verExoneraciones();
+      setExoneraciones(resultado);
+    } catch (error) {
+      console.error("Error al ver Exoneraciones:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
+  //Funciones del contrato de resennas
+  const registrarResenna = async () => {
+    try {
+      const tx = await contratoResennas.registrarGuiaTurista(
+        nombreLugar,
+        cuenta, puntaje, comentario
+      );
+      await tx.wait();
+      setNombreLugar("");
+      setCuenta("");
+      setPuntaje(0);
+      setComentario("");
+      alert("Reseña registrado");
+    } catch (error) {
+      console.error("Error al registrar la Reseña:", error);
       alert("Error: " + (error.reason || error.message));
     }
   };
@@ -419,7 +521,7 @@ function Home() {
             onChange={(e) => setNombre(e.target.value)}
           />
           <input
-            placeholder="Precio"
+            placeholder="Precio en Wei"
             type="number"
             onChange={(e) => setPrecio(e.target.value)}
           />
@@ -513,10 +615,12 @@ function Home() {
           onChange={(e) => setId(e.target.value)}
         />
         <p>
-          Lugar de la reserva: {reserva.nombreLugar}, Total Cobrado en Wit:{" "}
-          {reserva.totalCobrado}, Cupos disponibles: {reserva.cuposDisponibles},
-          Cuenta del Guía: {reserva.guiaTuristas}, Fecha de la reserva:{" "}
-          {new Date(Number(reserva.fecha) * 1000).toLocaleString()}, Estado: {reserva.estado? " Activa": " Inactiva"}
+          Número de reservación: {reserva.id}, Lugar de la reserva:{" "}
+          {reserva.nombreLugar}, Total Cobrado en Wit: {reserva.totalCobrado},
+          Cupos disponibles: {reserva.cuposDisponibles}, Cuenta del Guía:{" "}
+          {reserva.guiaTuristas}, Fecha de la reserva:{" "}
+          {new Date(Number(reserva.fecha) * 1000).toLocaleString()}, Estado:{" "}
+          {reserva.estado ? " Activa" : " Inactiva"}
         </p>
 
         <h3>Lista de Reservaciones:</h3>
@@ -526,10 +630,12 @@ function Home() {
         <ul>
           {reservas.map((r, i) => (
             <li key={i}>
-              Lugar de la reserva: {r.nombreLugar}, Total Cobrado en Wit:{" "}
-              {r.totalCobrado}, Cupos disponibles: {r.cuposDisponibles}, Cuenta
-              del Guía: {r.guiaTuristas}, Fecha de la reserva:{" "}
-              {new Date(Number(r.fecha) * 1000).toLocaleString()}, Estado: {r.estado? " Activa": " Inactiva"}
+              Número de reservación: {r.id}, Lugar de la reserva:{" "}
+              {r.nombreLugar}, Total Cobrado en Wit: {r.totalCobrado}, Cupos
+              disponibles: {r.cuposDisponibles}, Cuenta del Guía:{" "}
+              {r.guiaTuristas}, Fecha de la reserva:{" "}
+              {new Date(Number(r.fecha) * 1000).toLocaleString()}, Estado:{" "}
+              {r.estado ? " Activa" : " Inactiva"}
             </li>
           ))}
         </ul>
@@ -553,7 +659,7 @@ function Home() {
           style={{ width: "100px" }}
           onChange={(e) => setMonto(e.target.value)}
         />
-         <h3>Eliminar Reservación:</h3>
+        <h3>Eliminar Reservación:</h3>
         <button className="boton-rojo" onClick={eliminarReserva}>
           Eliminar Reservación
         </button>
@@ -564,6 +670,66 @@ function Home() {
           onChange={(e) => setId(e.target.value)}
         />
       </div>
+      <hr style={{ margin: "30px 0" }} />
+
+      <div>
+        <h2>Administración de Exoneración de responsabilidades</h2>
+        <button className="boton-azul" onClick={verMensajeExoneraciones}>
+          Ver Mensaje de Exoneración de Responsabilidades
+        </button>
+        <p>{mensajeLega}</p>
+        <button className="boton-naranja" onClick={registrarExoneracion}>
+          Registrar Exoneración
+        </button>
+
+        <input
+          placeholder="Número de Reservación"
+          type="number"
+          onChange={(e) => setId(e.target.value)}
+        />
+        <input
+          placeholder="Cuenta del guía de turistas"
+          style={{ width: "300px" }}
+          onChange={(e) => setCuenta(e.target.value)}
+        />
+
+        <textarea
+          placeholder="Ingrese un arreglo con las cuentas de los  turistas"
+          style={{ width: "500px", height: "150px", margin: "15px 0" }}
+          onChange={(e) => setCuentas(e.target.value)}
+        />
+        <h3>Buscar Exoneración por número:</h3>
+        <button className="boton-azul" onClick={verExoneracion}>
+          Buscar Exoneración
+        </button>
+        <input
+          placeholder="Número de Reserva"
+          type="number"
+          style={{ width: "70px" }}
+          onChange={(e) => setId(e.target.value)}
+        />
+        <p>
+          Número de Exoneracion: {exoneracion.id}, Número de reservación:{" "}
+          {exoneracion.idReseva}, Cuentas de Turistas exonerados:{" "}
+          {exoneracion.turistasExonerados
+            ? exoneracion.turistasExonerados.join(", ")
+            : ""}
+        </p>
+        <h3>Registro de exoneraciones:</h3>
+        <button className="boton-azul" onClick={verExoneraciones}>
+          Ver Exoneraciones
+        </button>
+        <ul>
+          {exoneraciones.map((e, i) => (
+            <li key={i}>
+              Número de Exoneracion: {e.id}, Número de reservación: {e.idReseva}
+              , Cuentas de Turistas exonerados:{" "}
+              {e.turistasExonerados ? e.turistasExonerados.join(", ") : ""}
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <hr style={{ margin: "30px 0" }} />
     </div>
   );

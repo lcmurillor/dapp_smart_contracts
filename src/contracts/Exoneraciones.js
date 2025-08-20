@@ -1,6 +1,6 @@
-export const CONTRATO_RESERVAS_ADDRESS = "0x10F709aCb243DBF17D3A1d7E6b1518Cf06513B6c"; //Address del Contrato
+export const CONTRATO_EXONERACIONES_ADDRESS = "0x878893D214DbC4346f2AB6b86a7D4586103f21e0"; //Address del Contrato
 
-export const CONTRATO_RESERVAS_ABI = [
+export const CONTRATO_EXONERACIONES_ABI = [
 	{
 		"inputs": [
 			{
@@ -10,7 +10,7 @@ export const CONTRATO_RESERVAS_ABI = [
 			},
 			{
 				"internalType": "address",
-				"name": "_lugaresContrato",
+				"name": "_reservasContrato",
 				"type": "address"
 			}
 		],
@@ -28,56 +28,12 @@ export const CONTRATO_RESERVAS_ABI = [
 			},
 			{
 				"indexed": false,
-				"internalType": "string",
-				"name": "nombreTursita",
-				"type": "string"
-			},
-			{
-				"indexed": false,
 				"internalType": "uint256",
-				"name": "monto",
+				"name": "idReseva",
 				"type": "uint256"
 			}
 		],
-		"name": "pagarReserva",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "nombreLugar",
-				"type": "string"
-			}
-		],
-		"name": "reservaEliminada",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "nombreLugar",
-				"type": "string"
-			}
-		],
-		"name": "reservaRegistrada",
+		"name": "ExoneracionRegistrada",
 		"type": "event"
 	},
 	{
@@ -86,22 +42,14 @@ export const CONTRATO_RESERVAS_ABI = [
 				"internalType": "uint256",
 				"name": "_idReserva",
 				"type": "uint256"
-			}
-		],
-		"name": "asignarTuristas",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
+			},
 			{
-				"internalType": "uint256",
-				"name": "_idReserva",
-				"type": "uint256"
+				"internalType": "address[]",
+				"name": "_turistas",
+				"type": "address[]"
 			}
 		],
-		"name": "eliminarReserva",
+		"name": "registrarExoneracion",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -158,28 +106,33 @@ export const CONTRATO_RESERVAS_ABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "string",
-				"name": "_nombreLugar",
-				"type": "string"
+				"internalType": "uint256",
+				"name": "_idReserva",
+				"type": "uint256"
 			}
 		],
-		"name": "obtenerLugar",
+		"name": "obtenerReservas",
 		"outputs": [
 			{
 				"components": [
 					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
 						"internalType": "string",
-						"name": "nombre",
+						"name": "nombreLugar",
 						"type": "string"
 					},
 					{
 						"internalType": "uint256",
-						"name": "precio",
+						"name": "totalCobrado",
 						"type": "uint256"
 					},
 					{
 						"internalType": "uint8",
-						"name": "cupos",
+						"name": "cuposDisponibles",
 						"type": "uint8"
 					},
 					{
@@ -188,12 +141,17 @@ export const CONTRATO_RESERVAS_ABI = [
 						"type": "address"
 					},
 					{
+						"internalType": "uint256",
+						"name": "fecha",
+						"type": "uint256"
+					},
+					{
 						"internalType": "bool",
 						"name": "estado",
 						"type": "bool"
 					}
 				],
-				"internalType": "struct Lugares.Lugar",
+				"internalType": "struct Reservas.Reserva",
 				"name": "",
 				"type": "tuple"
 			}
@@ -245,35 +203,12 @@ export const CONTRATO_RESERVAS_ABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "string",
-				"name": "_nombreLugar",
-				"type": "string"
-			},
-			{
-				"internalType": "address",
-				"name": "_guiaTuristas",
-				"type": "address"
-			},
-			{
 				"internalType": "uint256",
-				"name": "_fecha",
+				"name": "_idExoneracion",
 				"type": "uint256"
 			}
 		],
-		"name": "registrarReservas",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_idReserva",
-				"type": "uint256"
-			}
-		],
-		"name": "verReserva",
+		"name": "verExoneracion",
 		"outputs": [
 			{
 				"components": [
@@ -283,37 +218,17 @@ export const CONTRATO_RESERVAS_ABI = [
 						"type": "uint256"
 					},
 					{
-						"internalType": "string",
-						"name": "nombreLugar",
-						"type": "string"
-					},
-					{
 						"internalType": "uint256",
-						"name": "totalCobrado",
+						"name": "idReseva",
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint8",
-						"name": "cuposDisponibles",
-						"type": "uint8"
-					},
-					{
-						"internalType": "address",
-						"name": "guiaTuristas",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "fecha",
-						"type": "uint256"
-					},
-					{
-						"internalType": "bool",
-						"name": "estado",
-						"type": "bool"
+						"internalType": "address[]",
+						"name": "turistasExonerados",
+						"type": "address[]"
 					}
 				],
-				"internalType": "struct Reservas.Reserva",
+				"internalType": "struct Exoneraciones.Exoneracion",
 				"name": "",
 				"type": "tuple"
 			}
@@ -323,7 +238,7 @@ export const CONTRATO_RESERVAS_ABI = [
 	},
 	{
 		"inputs": [],
-		"name": "verReservas",
+		"name": "verExoneraciones",
 		"outputs": [
 			{
 				"components": [
@@ -333,39 +248,32 @@ export const CONTRATO_RESERVAS_ABI = [
 						"type": "uint256"
 					},
 					{
-						"internalType": "string",
-						"name": "nombreLugar",
-						"type": "string"
-					},
-					{
 						"internalType": "uint256",
-						"name": "totalCobrado",
+						"name": "idReseva",
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint8",
-						"name": "cuposDisponibles",
-						"type": "uint8"
-					},
-					{
-						"internalType": "address",
-						"name": "guiaTuristas",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "fecha",
-						"type": "uint256"
-					},
-					{
-						"internalType": "bool",
-						"name": "estado",
-						"type": "bool"
+						"internalType": "address[]",
+						"name": "turistasExonerados",
+						"type": "address[]"
 					}
 				],
-				"internalType": "struct Reservas.Reserva[]",
-				"name": "",
+				"internalType": "struct Exoneraciones.Exoneracion[]",
+				"name": "_resultado",
 				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "verMensajeExoneraciones",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",

@@ -1,4 +1,4 @@
-export const CONTRATO_USUARIOS_ADDRESS = "0x6234448b370d9DdD776918F72Dd82C06A7406858"; //Address del Contrato
+export const CONTRATO_USUARIOS_ADDRESS = "0xdb75D7Bb84AFc1690DC556ede8253eC59D4a6eb7"; //Address del Contrato
 
 export const CONTRATO_USUARIOS_ABI = [
   {

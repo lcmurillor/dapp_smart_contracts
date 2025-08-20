@@ -1,6 +1,47 @@
-export const CONTRATO_RESERVAS_ADDRESS = "0x10F709aCb243DBF17D3A1d7E6b1518Cf06513B6c"; //Address del Contrato
+export const CONTRATO_RESENNAS_ADDRESS = "0x1538700Bd22200b9E10891d1501161228f461b97"; //Address del Contrato
 
-export const CONTRATO_RESERVAS_ABI = [
+export const CONTRATO_RESENNAS_ABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_idResenna",
+				"type": "uint256"
+			}
+		],
+		"name": "eliminarResenna",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_nombreLugar",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "_turista",
+				"type": "address"
+			},
+			{
+				"internalType": "uint8",
+				"name": "_puntaje",
+				"type": "uint8"
+			},
+			{
+				"internalType": "string",
+				"name": "_comentario",
+				"type": "string"
+			}
+		],
+		"name": "registrarResenna",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
 	{
 		"inputs": [
 			{
@@ -29,17 +70,11 @@ export const CONTRATO_RESERVAS_ABI = [
 			{
 				"indexed": false,
 				"internalType": "string",
-				"name": "nombreTursita",
+				"name": "nombreLugar",
 				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "monto",
-				"type": "uint256"
 			}
 		],
-		"name": "pagarReserva",
+		"name": "ResennaEliminada",
 		"type": "event"
 	},
 	{
@@ -58,53 +93,8 @@ export const CONTRATO_RESERVAS_ABI = [
 				"type": "string"
 			}
 		],
-		"name": "reservaEliminada",
+		"name": "ResennaRegistrada",
 		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "nombreLugar",
-				"type": "string"
-			}
-		],
-		"name": "reservaRegistrada",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_idReserva",
-				"type": "uint256"
-			}
-		],
-		"name": "asignarTuristas",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_idReserva",
-				"type": "uint256"
-			}
-		],
-		"name": "eliminarReserva",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
 	},
 	{
 		"inputs": [],
@@ -245,67 +235,34 @@ export const CONTRATO_RESERVAS_ABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "string",
-				"name": "_nombreLugar",
-				"type": "string"
-			},
-			{
-				"internalType": "address",
-				"name": "_guiaTuristas",
-				"type": "address"
-			},
-			{
 				"internalType": "uint256",
-				"name": "_fecha",
+				"name": "_idResenna",
 				"type": "uint256"
 			}
 		],
-		"name": "registrarReservas",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_idReserva",
-				"type": "uint256"
-			}
-		],
-		"name": "verReserva",
+		"name": "verResernnaPorID",
 		"outputs": [
 			{
 				"components": [
-					{
-						"internalType": "uint256",
-						"name": "id",
-						"type": "uint256"
-					},
 					{
 						"internalType": "string",
 						"name": "nombreLugar",
 						"type": "string"
 					},
 					{
-						"internalType": "uint256",
-						"name": "totalCobrado",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint8",
-						"name": "cuposDisponibles",
-						"type": "uint8"
-					},
-					{
 						"internalType": "address",
-						"name": "guiaTuristas",
+						"name": "turista",
 						"type": "address"
 					},
 					{
-						"internalType": "uint256",
-						"name": "fecha",
-						"type": "uint256"
+						"internalType": "uint8",
+						"name": "puntaje",
+						"type": "uint8"
+					},
+					{
+						"internalType": "string",
+						"name": "comentario",
+						"type": "string"
 					},
 					{
 						"internalType": "bool",
@@ -313,7 +270,7 @@ export const CONTRATO_RESERVAS_ABI = [
 						"type": "bool"
 					}
 				],
-				"internalType": "struct Reservas.Reserva",
+				"internalType": "struct Resennas.Resenna",
 				"name": "",
 				"type": "tuple"
 			}
@@ -322,40 +279,36 @@ export const CONTRATO_RESERVAS_ABI = [
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "verReservas",
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_nombreLugar",
+				"type": "string"
+			}
+		],
+		"name": "verResernnasPorNombreLugar",
 		"outputs": [
 			{
 				"components": [
-					{
-						"internalType": "uint256",
-						"name": "id",
-						"type": "uint256"
-					},
 					{
 						"internalType": "string",
 						"name": "nombreLugar",
 						"type": "string"
 					},
 					{
-						"internalType": "uint256",
-						"name": "totalCobrado",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint8",
-						"name": "cuposDisponibles",
-						"type": "uint8"
-					},
-					{
 						"internalType": "address",
-						"name": "guiaTuristas",
+						"name": "turista",
 						"type": "address"
 					},
 					{
-						"internalType": "uint256",
-						"name": "fecha",
-						"type": "uint256"
+						"internalType": "uint8",
+						"name": "puntaje",
+						"type": "uint8"
+					},
+					{
+						"internalType": "string",
+						"name": "comentario",
+						"type": "string"
 					},
 					{
 						"internalType": "bool",
@@ -363,8 +316,8 @@ export const CONTRATO_RESERVAS_ABI = [
 						"type": "bool"
 					}
 				],
-				"internalType": "struct Reservas.Reserva[]",
-				"name": "",
+				"internalType": "struct Resennas.Resenna[]",
+				"name": "_resultado",
 				"type": "tuple[]"
 			}
 		],
