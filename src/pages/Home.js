@@ -61,7 +61,10 @@ function Home() {
   const [mensajeLega, setMensajeLegal] = useState("");
 
   const [puntaje, setPuntaje] = useState(0);
-const [comentario, setComentario] = useState("");
+  const [comentario, setComentario] = useState("");
+
+  const [resenna, setResenna] = useState({});
+  const [resennas, setResennas] = useState([]);
   //Cunado inica el proyecto, se crea el contrato y se obtiene la cuenta del usuario.
   useEffect(() => {
     const init = async () => {
@@ -382,9 +385,11 @@ const [comentario, setComentario] = useState("");
   //Funciones del contrato de resennas
   const registrarResenna = async () => {
     try {
-      const tx = await contratoResennas.registrarGuiaTurista(
+      const tx = await contratoResennas.registrarResenna(
         nombreLugar,
-        cuenta, puntaje, comentario
+        cuenta,
+        puntaje,
+        comentario
       );
       await tx.wait();
       setNombreLugar("");
@@ -394,6 +399,40 @@ const [comentario, setComentario] = useState("");
       alert("Reseña registrado");
     } catch (error) {
       console.error("Error al registrar la Reseña:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
+  const verResernnaPorID = async () => {
+    try {
+      const resultado = await contratoResennas.verResernnaPorID(id);
+      setResenna(resultado);
+    } catch (error) {
+      console.error("Error al ver Reseña por Número:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
+  const verResernnasPorNombreLugar = async () => {
+    try {
+      const resultado = await contratoResennas.verResernnasPorNombreLugar(
+        nombreLugar
+      );
+      setResennas(resultado);
+    } catch (error) {
+      console.error("Error al ver Reseña por nombre de lugar:", error);
+      alert("Error: " + (error.reason || error.message));
+    }
+  };
+
+    const eliminarResenna = async () => {
+    try {
+      const tx = await contratoResennas.eliminarResenna(id);
+      await tx.wait();
+      setId(0);
+      alert("Reseña eliminado");
+    } catch (error) {
+      console.error("Error al eliminar la Reseña:", error);
       alert("Error: " + (error.reason || error.message));
     }
   };
@@ -729,6 +768,85 @@ const [comentario, setComentario] = useState("");
           ))}
         </ul>
       </div>
+
+      <hr style={{ margin: "30px 0" }} />
+      <div>
+        <h2>Administración de reseñas</h2>
+        <button className="boton-naranja" onClick={registrarResenna}>
+          Registrar Reseña
+        </button>
+
+        <input
+          placeholder="Nombre del Lugar"
+          onChange={(e) => setNombreLugar(e.target.value)}
+        />
+
+        <input
+          placeholder="Cuenta del turstia"
+          style={{ width: "300px" }}
+          onChange={(e) => setCuenta(e.target.value)}
+        />
+
+        <input
+          placeholder="Puntaje"
+          type="number"
+          style={{ width: "70px" }}
+          onChange={(e) => setPuntaje(e.target.value)}
+        />
+        <textarea
+          placeholder="Ingrese un un comentario"
+          style={{ width: "500px", height: "100px", margin: "15px 0" }}
+          onChange={(e) => setComentario(e.target.value)}
+        />
+
+        <h3>Buscar Reseña por número de reseña:</h3>
+        <button className="boton-azul" onClick={verResernnaPorID}>
+          Buscar Reseña
+        </button>
+        <input
+          placeholder="Número de Reseña"
+          type="number"
+          style={{ width: "70px" }}
+          onChange={(e) => setId(e.target.value)}
+        />
+        <p>
+          Número de Reseña: {resenna.id}, Nombre del lugar visitado:{" "}
+          {resenna.nombreLugar}, Cuentas de Turistas:{" "}
+          {resenna.turista}, Puntaje: {resenna.puntaje}, Comentario:{" "}
+          {resenna.comentario}
+        </p>
+
+         <h3>Buscar Reseña por Nombre de Lugar:</h3>
+        <button className="boton-azul" onClick={verResernnasPorNombreLugar}>
+          Buscar Reseña
+        </button>
+        <input
+          placeholder="Nombre del lugar"
+          onChange={(e) => setNombreLugar(e.target.value)}
+        />
+         <ul>
+          {resennas.map((r, i) => (
+            <li key={i}>
+              Número de Reseña: {r.id}, Nombre del lugar visitado:{" "}
+          {r.nombreLugar}, Cuentas de Turistas:{" "}
+          {r.turista}, Puntaje: {r.puntaje}, Comentario:{" "}
+          {r.comentario}
+            </li>
+          ))}
+        </ul>
+         <h3>Eliminar Reseñas:</h3>
+        <button className="boton-rojo" onClick={eliminarResenna}>
+          Eliminar Reseña
+        </button>
+        <input
+          placeholder="Numero de Reseña"
+          type="number"
+          style={{ width: "70px" }}
+          onChange={(e) => setId(e.target.value)}
+        />
+      </div>
+
+      
 
       <hr style={{ margin: "30px 0" }} />
     </div>

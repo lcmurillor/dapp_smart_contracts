@@ -1,4 +1,4 @@
-export const CONTRATO_RESENNAS_ADDRESS = "0x1538700Bd22200b9E10891d1501161228f461b97"; //Address del Contrato
+export const CONTRATO_RESENNAS_ADDRESS = "0x893034bF7d00012c3C9bba11ef8899033A4dF737"; //Address del Contrato
 
 export const CONTRATO_RESENNAS_ABI = [
 	{
@@ -245,6 +245,11 @@ export const CONTRATO_RESENNAS_ABI = [
 			{
 				"components": [
 					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
 						"internalType": "string",
 						"name": "nombreLugar",
 						"type": "string"
@@ -290,6 +295,11 @@ export const CONTRATO_RESENNAS_ABI = [
 		"outputs": [
 			{
 				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
 					{
 						"internalType": "string",
 						"name": "nombreLugar",
