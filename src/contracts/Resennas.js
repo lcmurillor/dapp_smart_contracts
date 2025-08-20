@@ -1,4 +1,4 @@
-export const CONTRATO_RESENNAS_ADDRESS = "0x893034bF7d00012c3C9bba11ef8899033A4dF737"; //Address del Contrato
+export const CONTRATO_RESENNAS_ADDRESS = "0x4bf31C048C6f1d05AF85C1A55189D6d3d0b15130"; //Address del Contrato
 
 export const CONTRATO_RESENNAS_ABI = [
 	{

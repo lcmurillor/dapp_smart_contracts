@@ -1,4 +1,4 @@
-export const CONTRATO_LUGARES_ADDRESS = "0x4Aa1327C2B8E19492fC5b86741aA2F08C78F5C1d"; //Address del Contrato
+export const CONTRATO_LUGARES_ADDRESS = "0x9Ea4Cf5480910306385f146697Ba2af4A6b17ada"; //Address del Contrato
 
 export const CONTRATO_LUGARES_ABI = [
 	{
